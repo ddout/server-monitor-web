@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>server-monitor-web</title>
+<!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+<link rel="stylesheet"
+	href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous">
+</head>
+<body style="margin-top:20px;margin-bottom:80px;">
+	<div id="app-main" class="container">
+		<div class="row" style="margin:20px 0;">
+			<div class="col-md-12 text-right">
+				<a v-on:click="authUserShow" v-if="userInfo.auth==false">auth</a> 
+				<span v-if="userInfo.auth==true">user:{{userInfo.user}}</span>
+			</div>
+			<div class="col-md-12 text-right">
+				<button type="button" class="btn btn-default" v-on:click="loadInfo" v-if="userInfo.auth==true">Refresh</button>
+			</div>
+			<div class="col-md-12 text-center" style="color:red;">{{errorMsg}}</div>
+		</div>
+		
+		<!--  -->
+		<div class="modal fade" tabindex="-1" role="dialog" id="auth-Modal">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title">Auth User</h4>
+		      </div>
+		      <div class="modal-body">
+		       		user:<input v-model="userInfo.user" placeholder="your user"/><br/>
+		       		pwd:<input v-model="userInfo.pwd" placeholder="your password" type="password"/><br/>
+		       		<span style="color:red;">{{userInfo.authMsg}}</span>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		        <button type="button" class="btn btn-primary" v-on:click="authUser">Auth do</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		<!--  -->
+		
+		
+		
+		
+		<div class="row">
+			<h3>System Info</h3>
+			<div class="col-md-12" style="max-height: 500px;overflow: auto;">
+				<table class="table table-bordered">
+					<tr>
+						<th class="text-center">name</th>
+						<th class="text-center">ip</th>
+						<th class="text-center">note</th>
+						<th class="text-center">lasttime</th>
+					</tr>
+					<tr v-for="a in viewA" v-on:click="showViewB(a.name)">
+						<td class="text-left">{{a.name}}</td>
+						<td class="text-left">{{a.ip}}</td>
+						<td class="text-left">{{a.note}}</td>
+						<td class="text-right">{{a.lasttime}}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		
+		<div class="row">
+			<h3>System View <span style="font-size:14px;" v-show="viewB.isLoading==true">loading.....</span></h3>
+			<div class="col-md-12">
+				<h5 v-show="viewB.isActive==true"><span style="font-size:16px;margin-riht:40px;">{{viewB.name}}</span"></h5>
+				<h6 v-show="viewB.isActive==true">{{viewB.ctime}}</h6>
+				<p v-show="viewB.isActive==true">[共:{{viewB.cnt}}条记录]
+					<a v-on:click="viewNextB">上一条</a>
+					<a v-on:click="viewPrevB">下一条</a>
+				</p>
+				<pre>
+					{{viewB.mstatestr}}
+				</pre>
+			</div>
+		</div>
+		
+	</div>
+		
+</div>
+
+
+
+
+	<script src="//cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+	<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+	<script
+		src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"
+		integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+		crossorigin="anonymous"></script>
+	<script src="js/vue.js"></script>
+	<script  src="js/index.js"></script>
+</body>
+</html>

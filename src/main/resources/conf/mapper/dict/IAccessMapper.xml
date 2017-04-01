@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cdhy.ei.dao.dict.IAccessMapper">
+
+	<select id="getM" parameterType="map" resultType="map">
+		SELECT 
+		name,ip,note,mstate,DATE_FORMAT(lasttime,'%y-%m-%d %T') lasttime
+		from t_m
+		where name=#{name}
+	</select>
+	
+	<insert id="saveM" parameterType="map">
+		insert into t_m
+		(name,ip,note,mstate,lasttime)
+		values
+		(
+		#{name,jdbcType=VARCHAR},
+		#{ip,jdbcType=VARCHAR},
+		#{note,jdbcType=VARCHAR},
+		1,
+		now()
+		)
+	</insert>
+	<update id="updateLastTime" parameterType="map">
+		update t_m
+		set mstate=1,lasttime=now()
+		where name=#{name}
+	</update>
+	<insert id="saveMState" parameterType="map">
+		insert into t_mstate
+		(name, mstatestr,ctime)
+		values
+		(#{name,jdbcType=VARCHAR},
+		#{mstate_str,jdbcType=VARCHAR},
+		now()
+		)
+	</insert>
+	
+	<select id="listM" parameterType="map" resultType="map">
+		select 
+		name,ip,note,mstate,DATE_FORMAT(lasttime,'%Y-%m-%d %T') lasttime
+		from t_m
+		order by name asc,lasttime desc
+	</select>
+	
+	
+	<select id="listMState" parameterType="map" resultType="map">
+		select 
+		id,
+		name,mstatestr,DATE_FORMAT(ctime,'%Y-%m-%d %T') ctime,
+		(select count(1) from t_mstate where name='server-142') cnt
+		from t_mstate
+		where name=#{name}
+		order by ctime desc
+		limit 0,1
+	</select>
+	
+	
+	<select id="getNextB" parameterType="map" resultType="map">
+		select 
+		id,
+		name,mstatestr,DATE_FORMAT(ctime,'%Y-%m-%d %T') ctime,
+		(select count(1) from t_mstate where name='server-142') cnt
+		from t_mstate
+		where name=#{name}
+		  and id&lt;#{id}
+		order by ctime desc
+		limit 0,1
+	</select>
+	<select id="getPrevB" parameterType="map" resultType="map">
+		select 
+		id,
+		name,mstatestr,DATE_FORMAT(ctime,'%Y-%m-%d %T') ctime,
+		(select count(1) from t_mstate where name='server-142') cnt
+		from t_mstate
+		where name=#{name}
+		  and id &gt; #{id}
+		order by ctime asc
+		limit 0,1
+	</select>
+	
+	<delete id="deleteClear" parameterType="map">
+		delete from t_mstate where DATE_FORMAT(now(),'%Y-%m-%d') > DATE_FORMAT(ctime,'%Y-%m-%d')
+	</delete>
+	
+	<select id="getAuthUser" parameterType="map" resultType="int">
+		select count(1) from t_bs_user
+		where user=#{user} and pwd=#{pwd}
+	</select>
+	
+	<select id="listLastStates" parameterType="map" resultType="map">
+		select id, name, mstatestr, DATE_FORMAT(ctime,'%Y-%m-%d %T') ctime 
+		from t_mstate
+		where id in
+		(
+		select max(id) from t_mstate 
+		group by name 
+		)
+	</select>
+	
+	<select id="listSendUsers" parameterType="map" resultType="map">
+		select * from t_bs_user where issend=999
+	</select>
+	
+	<insert id="saveLog" parameterType="map">
+		insert into t_sendlog
+		(lasttime)
+		values
+		(now())
+	</insert>
+	
+	<select id="getISLog" parameterType="map" resultType="int">
+		select (DATE_FORMAT(NOW(),'%T') >= #{monitorJobTimeStr,jdbcType=VARCHAR}) a,
+		(select count(1) from t_sendlog where DATE_FORMAT(NOW(),'%Y-%m-%d')=DATE_FORMAT(lasttime,'%Y-%m-%d'))  b
+	</select>
+</mapper>
